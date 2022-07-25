@@ -36,8 +36,6 @@ const Login = () => {
         dispatch(authActions.login(formProps));
     }
 
-    console.log(authUser, authError, 'error')
-
     return <div className='w-full h-screen bg-blue-200 p-20'>
         <div className='flex w-4/6 h-full bg-white mx-auto justify-center rounded-lg shadow-xl'>
             <div className='w-3/6 flex items-center justify-center'>

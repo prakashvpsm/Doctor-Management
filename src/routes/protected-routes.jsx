@@ -19,7 +19,6 @@ const ProtectedRoutes = (props) => {
 
     const auth = useAuth()
 
-
     return auth ? <Outlet /> : <Navigate to="/login" />
 }
 

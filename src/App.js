@@ -3,7 +3,7 @@ import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-
 
 import ProtectedRoutes from './routes/protected-routes';
 import PublicRoutes from './routes/public-route';
-import { protectedRoutes, publicRoutes } from './routes/routes';
+import { protectedRoutes, publicRoutes, admin, doctors } from './routes/routes';
 import Login from './pages/login';
 import NotFound from './pages/notfound';
 import { history } from './helpers';
@@ -22,7 +22,16 @@ const App = () => {
 
       <Route path="" element={<ProtectedRoutes />}>
         {
-          protectedRoutes.map(route => {
+          admin.map(route => {
+            return <Route path={`${route.path}/`} element={route.component} />
+
+          })
+        }
+      </Route>
+
+      <Route path="" element={<ProtectedRoutes />}>
+        {
+          doctors.map(route => {
             return <Route path={`${route.path}/*`} element={route.component} />
 
           })

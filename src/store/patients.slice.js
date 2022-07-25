@@ -1,11 +1,11 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { BASE_API_URI } from '../config';
+import { BASE_API_URI_PATIENTS} from '../config';
 
 import { fetchWrapper } from '../helpers';
 
 // create slice
 
-const name = 'users';
+const name = 'patients';
 const initialState = createInitialState();
 const extraActions = createExtraActions();
 const extraReducers = createExtraReducers();
@@ -13,26 +13,25 @@ const slice = createSlice({ name, initialState, extraReducers });
 
 // exports
 
-export const userActions = { ...slice.actions, ...extraActions };
-export const usersReducer = slice.reducer;
+export const patientsActions = { ...slice.actions, ...extraActions };
+export const patientsReducer = slice.reducer;
 
 // implementation
 
 function createInitialState() {
     return {
-        users: {},
-        doctors: {}
+        patients: {}
     }
 }
 
 function createExtraActions() {
-    const baseUrl = BASE_API_URI;
+    const baseUrl = BASE_API_URI_PATIENTS;
 
     return {
         getAll: getAll(),
-        getDoctors: getDoctors(),
-        create: create()
-    };
+        create : create(),
+        getByDate : getByDate()
+    };    
 
     function getAll() {
         return createAsyncThunk(
@@ -40,17 +39,16 @@ function createExtraActions() {
             async () => await fetchWrapper.get(baseUrl)
         );
     }
-    function getDoctors() {
-        return createAsyncThunk(
-            `doctors`,
-            async () => await fetchWrapper.get(`${baseUrl}/doctors`)
-        );
-    }
-
     function create() {
         return createAsyncThunk(
             `${name}`,
-            async (data) => await fetchWrapper.post(baseUrl, { ...data })
+            async (data) => await fetchWrapper.post(baseUrl, {...data})
+        );
+    }
+    function getByDate() {
+        return createAsyncThunk(
+            `${name}`,
+            async ({id, date}) => await fetchWrapper.get(`${baseUrl}/${id}/${date}`)
         );
     }
 }
@@ -58,50 +56,50 @@ function createExtraActions() {
 function createExtraReducers() {
     return {
         ...getAll(),
-        ...getDoctors(),
-        ...create()
+        ...create(),
+        ...getByDate()
     };
 
     function getAll() {
         var { pending, fulfilled, rejected } = extraActions.getAll;
         return {
             [pending]: (state) => {
-                state.users = { loading: true };
+                state.patients = { loading: true };
             },
             [fulfilled]: (state, action) => {
-                state.users = action.payload;
+                state.patients = action.payload;
             },
             [rejected]: (state, action) => {
-                state.users = { error: action.error };
+                state.patients = { error: action.error };
             }
         };
     }
-    function getDoctors() {
-        var { pending, fulfilled, rejected } = extraActions.getDoctors;
+    function getByDate() {
+        var { pending, fulfilled, rejected } = extraActions.getByDate;
         return {
             [pending]: (state) => {
-                state.doctors = { loading: true };
+                state.patients = { loading: true };
             },
             [fulfilled]: (state, action) => {
-                state.doctors = action.payload;
+                state.patients = action.payload;
             },
             [rejected]: (state, action) => {
-                state.doctors = { error: action.error };
+                state.patients = { error: action.error };
             }
         };
-
     }
+
     function create() {
         var { pending, fulfilled, rejected } = extraActions.create;
         return {
             [pending]: (state) => {
-                state.users = { loading: true };
+                state.patients = { loading: true };
             },
             [fulfilled]: (state, action) => {
-                state.users = action.payload;
+                state.patients = action.payload;
             },
             [rejected]: (state, action) => {
-                state.users = { error: action.error };
+                state.patients = { error: action.error };
             }
         };
     }

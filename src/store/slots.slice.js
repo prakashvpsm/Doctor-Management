@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { BASE_API_URI } from '../config';
+import { BASE_API_URI_SLOTS} from '../config';
 
 import { fetchWrapper } from '../helpers';
 
@@ -25,10 +25,12 @@ function createInitialState() {
 }
 
 function createExtraActions() {
-    const baseUrl = BASE_API_URI;
+    const baseUrl = BASE_API_URI_SLOTS;
 
     return {
-        getAll: getAll()
+        getAll: getAll(),
+        create : create(),
+        getByDate : getByDate()
     };    
 
     function getAll() {
@@ -37,11 +39,25 @@ function createExtraActions() {
             async () => await fetchWrapper.get(baseUrl)
         );
     }
+    function create() {
+        return createAsyncThunk(
+            `${name}`,
+            async (data) => await fetchWrapper.post(baseUrl, {...data})
+        );
+    }
+    function getByDate() {
+        return createAsyncThunk(
+            `${name}`,
+            async ({id, date}) => await fetchWrapper.get(`${baseUrl}/${id}/${date}`)
+        );
+    }
 }
 
 function createExtraReducers() {
     return {
-        ...getAll()
+        ...getAll(),
+        ...create(),
+        ...getByDate()
     };
 
     function getAll() {
@@ -52,6 +68,37 @@ function createExtraReducers() {
             },
             [fulfilled]: (state, action) => {
                 state.slots = action.payload;
+            },
+            [rejected]: (state, action) => {
+                state.slots = { error: action.error };
+            }
+        };
+    }
+    function getByDate() {
+        var { pending, fulfilled, rejected } = extraActions.getByDate;
+        return {
+            [pending]: (state) => {
+                state.slots = { loading: true };
+            },
+            [fulfilled]: (state, action) => {
+                state.slots = action.payload;
+            },
+            [rejected]: (state, action) => {
+                state.slots = { error: action.error };
+            }
+        };
+    }
+
+    function create() {
+        var { pending, fulfilled, rejected } = extraActions.create;
+        return {
+            [pending]: (state) => {
+                state.slots = { loading: true };
+            },
+            [fulfilled]: (state, action) => {
+                const existingData = state?.slots?.data ? state.slots.data : []
+                const newData = [...existingData, action.payload && action.payload.data && action.payload.data.doc ?action.payload.data.doc : {}]
+                state.slots.data = newData;
             },
             [rejected]: (state, action) => {
                 state.slots = { error: action.error };

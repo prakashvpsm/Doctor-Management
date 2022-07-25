@@ -4,17 +4,25 @@ import Admin from '../pages/admin/index';
 import Doctors from '../pages/doctors';
 
 const protectedRoutes = [
+ 
+];
+
+const admin = [
   {
     path: '',
     component: <Admin />,
     exact: true
   },
+]
+
+const doctors = [
+
   {
     path: 'doctors',
     component: <Doctors />,
     exact: true
   }
-];
+]
 
 
 const publicRoutes = [
@@ -27,5 +35,7 @@ const publicRoutes = [
 
 export {
   protectedRoutes,
-  publicRoutes
+  publicRoutes,
+  admin,
+  doctors
 };

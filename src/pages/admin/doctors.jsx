@@ -12,10 +12,6 @@ const columns = [
         dataIndex: 'name',
     },
     {
-        title: 'Category',
-        dataIndex: 'category',
-    },
-    {
         title: 'Email',
         dataIndex: 'email',
     },
@@ -52,10 +48,12 @@ export default function Doctors() {
     const userDetails = useSelector(x => x.users.users)
 
     const [visible, setVisible] = useState(false);
+    const [error, setError] = useState(null);
     const [placement, setPlacement] = useState('right');
 
     useEffect(() => {
         dispatch(userActions.getAll());
+        setError(null)
     }, [])
 
 
@@ -73,12 +71,28 @@ export default function Doctors() {
 
     const submit = (e) => {
         e.preventDefault();
+        setError(null)
         const formData = new FormData(e.target);
         const formProps = Object.fromEntries(formData);
         console.log(formProps, 'props')
+
+        if(formProps.name && formProps.email && formProps.password){
+            const reqb = {
+                "name": formProps.name,
+                "email" : formProps.email,
+                "password"  :formProps.password,
+                "passwordConfirm" : formProps.password
+              }
+              dispatch(userActions.create(reqb))
+
+              setTimeout(() => {
+                window.location.reload()
+              }, 1000);
+        }else{
+            setError('Fill all the fields')
+        }
     }
 
-    console.log(userDetails, 'userDetails')
     return (
         <div className='p-12 flex flex-col gap-10'>
             <div className='ml-auto'>
@@ -113,12 +127,6 @@ export default function Doctors() {
                                 <input type={"email"} required={true} name="email" className='w-full p-2 border rounded' />
                             </div>
                         </div>
-                        <div className='flex justify-start flex-col items-start gap-5'>
-                            <div className='text-xs font-bold uppercase tet-xs'>Category :</div>
-                            <div className='w-5/6'>
-                                <Select options={options} defaultValue="orthopaedics" />
-                            </div>
-                        </div>
 
                         <div className='flex justify-start flex-col items-start gap-5'>
                             <div className='text-xs font-bold uppercase tet-xs'>Password :</div>
@@ -136,9 +144,7 @@ export default function Doctors() {
                     </div>
                     <div className='mt-auto ml-auto flex gap-5'>
                         <button onClick={onClose} className='bg-gray-500 px-4 py-2 text-white rounded'>Cancel</button>
-
                         <button type='submit' className='bg-primary px-4 py-2 text-white rounded'>Submit</button>
-
                     </div>
                 </form>
 

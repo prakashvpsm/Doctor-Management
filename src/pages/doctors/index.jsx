@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { DatePicker, Space } from 'antd';
 
 import { Routes, Route, Navigate, useNavigate, useLocation, Link } from 'react-router-dom'
@@ -6,20 +6,46 @@ import { Routes, Route, Navigate, useNavigate, useLocation, Link } from 'react-r
 import Layout from '../../components/layout'
 import PatientLists from './lists';
 import Appointments from './appointments';
+import { useDispatch, useSelector } from 'react-redux';
+import { patientsActions, authActions } from '../../store';
+
+import moment from 'moment';
 
 export default function Admin({ match }) {
 
-    console.log(match, 'match')
+    const dispatch = useDispatch();
 
-    
+    const patientDetails = useSelector(x => x.patients.patients);
+    const userDetails = useSelector(x => x.auth.user.data.user);
+
+    const [selectedDate, setDate] = useState(moment());
+
+
+    useEffect(() => {
+        getPatients(selectedDate);
+    }, [])
+
+    const getPatients = (dateavail) => {
+        const b = {
+            id: userDetails._id,
+            date: `${moment(dateavail).format("DD-MM-YYYY")}`,
+        }
+        dispatch(patientsActions.getByDate(b))
+    }
+
+
 
     const logout = () => {
-
+        dispatch(authActions.logout());
     }
 
     const onChange = (date, dateString) => {
         console.log(date, dateString);
+        getPatients(date);
+        setDate(date)
     };
+
+    console.log(patientDetails, 'patientDetails')
 
     return (
         <div>
@@ -29,12 +55,12 @@ export default function Admin({ match }) {
                     <div className='flex gap-3 items-center justify-center'>
                         <div className='w-10 h-10 rounded-full bg-gray-200'></div>
                         <div className='flex flex-col gap-1'>
-                            <div className='text-sm font-bold'>Dr. MR Agarwal</div>
-                            <div className='text-xs texxt-gray-400'>General Surgery</div>
+                            <div className='text-sm font-bold'>{userDetails.name}</div>
+                            <div className='text-xs texxt-gray-400'>{userDetails.email}</div>
                         </div>
                     </div>
                     <div className='flex gap-3 items-center justify-center'>
-                        <DatePicker className='border-none rounded' onChange={onChange} />
+                        <DatePicker defaultValue={selectedDate} className='border-none rounded' onChange={onChange} />
                     </div>
                     <div className='ml-auto flex gap-6 items-center justify-center px-10'>
                         <Link to={"appointment"}>
